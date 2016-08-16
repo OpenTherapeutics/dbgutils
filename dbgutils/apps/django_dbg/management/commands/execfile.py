@@ -5,24 +5,29 @@ Django settings
 import os
 import sys
 import traceback
-from django.utils import termcolors
 from django.core.management.base import BaseCommand
 
-style = termcolors.make_style(fg='green', opts=('bold',))
+def execute(script):
+    kws = {'__name__': '__main__', '__file__': script}
+    if sys.version_info[0] < 3:
+        execfile(script, kws)
+    else:
+        exec(compile(open(script).read(), script, 'exec'), kws)
 
-#===============================================================================
 class Command(BaseCommand):
     help = ' '.join([line.strip() for line in __doc__.strip().splitlines()])
 
-    #---------------------------------------------------------------------------
     def add_arguments(self, parser):
         parser.add_argument('args', nargs='+')
     
-    #---------------------------------------------------------------------------
     def handle(self, *args, **options):
+        is_verbose = options.get('verbosity', 1) > 1
         script = os.path.abspath(os.path.expandvars(os.path.normpath(args[0])))
-        sys.stderr.write('Executing script {}\n'.format(script))
+        if is_verbose:
+            self.stderr.write(self.style.WARNING('Executing script {}'.format(script)))
+        
         sys.argv = [script] + list(args[1:])
         sys.path.append(os.path.dirname(script))
-        execfile(script, {'__name__': '__main__', '__file__': script})
+        
+        execute(script)
 
