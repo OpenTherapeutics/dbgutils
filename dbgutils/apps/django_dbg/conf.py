@@ -15,12 +15,12 @@ DEBUG_LOGGING = {
         },
         'null': {
             'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler',
+            'class': 'logging.NullHandler',
         },
     },
     'loggers': {
         '': {
-            'handlers': ['console'],
+            'handlers': ['console', ],
             'level': 'DEBUG'
         },
         'django': {
